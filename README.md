@@ -7,4 +7,8 @@ A modular, scalable, and service-oriented project with User, Course, Lesson, Pay
 - Modular structure
 - Scalable and maintainable
 - Core modules: User, Course, Lesson, Payment, Gateway, (stats)
+<div align="center"> 
+  
+  **vv** 
+</div>
 
