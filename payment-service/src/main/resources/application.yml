@@ -1,0 +1,47 @@
+server:
+  port: 8082 # Payment-service porti
+
+spring:
+  application:
+    name: payment-service
+
+  datasource:
+    url: ${PAYMENT_DB_URL:jdbc:postgresql://localhost:5432/skill_gate_payment_db}
+    username: ${PAYMENT_DB_USERNAME:postgres}
+    password: ${PAYMENT_DB_PASSWORD:admin}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# Eureka Client (Discovery Service)
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+# Feign Client va Timeout sozlamalari
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: full
+
+# Logging darajasi (Muammolarni aniqlash uchun)
+logging:
+  level:
+    root: INFO
+    uz.vv.paymentservice: DEBUG
+    org.springframework.cloud.openfeign: DEBUG
