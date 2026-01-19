@@ -27,7 +27,7 @@ class UserService(
     repository: UserRepo,
     private val passwordEncoder: PasswordEncoder,
     private val roleRepo: RoleRepo,
-    @Value("\${user.signup-bonus}")
+    @Value("\${user.signup}")
     private val signupBonus: Int,
     @Value("\${user.new-window-days}")
     private val newWindowDays: Long,

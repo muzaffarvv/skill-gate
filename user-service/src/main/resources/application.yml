@@ -30,5 +30,5 @@ eureka:
       defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka/}
 
 user:
-  signup-bonus: ${USER_SIGNUP_BONUS:50}
+  signup: ${USER_SIGNUP:50}
   new-window-days: ${USER_NEW_WINDOW_DAYS:30}

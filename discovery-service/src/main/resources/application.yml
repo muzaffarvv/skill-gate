@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: discovery-service
+server:
+  port: 8761 # Eureka standarti
+
+eureka:
+  client:
+    register-with-eureka: false # O'zi o'zini ro'yxatga olmasligi uchun
+    fetch-registry: false
