@@ -6,12 +6,14 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import uz.vv.courseservice.dto.CourseCU
 import uz.vv.courseservice.dto.CourseResponse
+import uz.vv.courseservice.feign.UserClient
 import uz.vv.courseservice.service.CourseService
 
 @RestController
 @RequestMapping("/api/v1/courses")
 class CourseController(
-    private val service: CourseService
+    private val service: CourseService,
+    private val userClient: UserClient
 ) {
 
     @PostMapping
@@ -48,5 +50,16 @@ class CourseController(
     fun enroll(@PathVariable id: Long, @RequestParam studentId: Long): ResponseEntity<Unit> {
         service.enrollStudent(id, studentId)
         return ResponseEntity.ok().build()
+    }
+
+    @GetMapping("/user/{id}")
+    fun getUserCourseDetails(@PathVariable id: Long): ResponseEntity<List<CourseResponse>> {
+        return try {
+            val user = userClient.getUserById(id)
+            val courses = service.getCoursesByUser(user.id)
+            ResponseEntity.ok(courses)
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().build()
+        }
     }
 }

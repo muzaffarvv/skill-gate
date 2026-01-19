@@ -19,6 +19,11 @@ class CourseService(
     CourseMapper
 ) {
 
+    fun getCoursesByUser(userId: Long): List<CourseResponse> {
+        val courses = repository.findAllByStudentsIdsContaining(userId)
+        return courses.map { CourseMapper.toDto(it) }
+    }
+
     @Transactional
     override fun toEntity(dto: CourseCU): Course {
         val course = CourseMapper.toEntity(dto)

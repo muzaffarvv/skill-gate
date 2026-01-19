@@ -8,4 +8,5 @@ import java.math.BigDecimal
 @Repository
 interface CourseRepo : BaseRepo<Course> {
     fun findCoursesByPrice( price: BigDecimal) : List<Course>
+    fun findAllByStudentsIdsContaining(userId: Long): List<Course>
 }

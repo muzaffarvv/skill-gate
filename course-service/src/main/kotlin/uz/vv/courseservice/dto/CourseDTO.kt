@@ -23,3 +23,11 @@ data class CourseResponse(
     val lessons: List<LessonResponse> = emptyList(),
     val totalDuration: Int?
 )
+
+data class UserResponse(
+    val id: Long,
+    val firstName: String,
+    val lastName: String,
+    val phoneNumber: String,
+    val balance: BigDecimal,
+)
