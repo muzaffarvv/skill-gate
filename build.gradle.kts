@@ -9,9 +9,6 @@ allprojects {
     repositories {
         mavenCentral()
     }
-    // Workaround for older IDE integrations that still invoke the removed
-    // 'prepareKotlinBuildScriptModel' task. Register a no-op task only if it
-    // doesn't already exist in the project to avoid duplicates.
     if (tasks.findByName("prepareKotlinBuildScriptModel") == null) {
         tasks.register("prepareKotlinBuildScriptModel") {}
     }
