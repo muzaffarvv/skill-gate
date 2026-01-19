@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import uz.vv.userservice.dto.BalanceRequest
 import uz.vv.userservice.dto.ChangePasswordRequest
 import uz.vv.userservice.dto.UserDTO
 import uz.vv.userservice.dto.UserResponseDto
@@ -28,10 +29,9 @@ class UserController(private val userService: UserService) {
 
     @PostMapping("/fill-balance")
     fun fillBalance(
-        @RequestParam phoneNumber: String,
-        @RequestParam amount: BigDecimal
+        @RequestBody request: BalanceRequest
     ): ResponseEntity<UserResponseDto> {
-        return ResponseEntity.ok(userService.fill(phoneNumber, amount))
+        return ResponseEntity.ok(userService.fill(request))
     }
 
     @GetMapping("/phone/{phoneNumber}")
@@ -39,12 +39,12 @@ class UserController(private val userService: UserService) {
         return ResponseEntity.ok(userService.getByPhoneNumber(phoneNumber))
     }
 
+    // JSON orqali mablag'ni yechish
     @PostMapping("/internal/withdraw")
     fun withdrawInternal(
-        @RequestParam phoneNumber: String,
-        @RequestParam amount: BigDecimal
+        @RequestBody request: BalanceRequest
     ): ResponseEntity<Boolean> {
-        val result = userService.withdraw(phoneNumber, amount)
+        val result = userService.withdraw(request)
         return ResponseEntity.ok(result)
     }
 

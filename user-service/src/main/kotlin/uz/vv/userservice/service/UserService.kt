@@ -21,6 +21,7 @@ import java.math.BigDecimal
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import org.springframework.beans.factory.annotation.Value
+import uz.vv.userservice.dto.BalanceRequest
 
 @Service
 class UserService(
@@ -50,20 +51,20 @@ class UserService(
     }
 
     @Transactional
-    override fun withdraw(phoneNumber: String, amount: BigDecimal): Boolean {
-        val user = getUserByPhoneNumber(phoneNumber)
+    override fun withdraw(request: BalanceRequest): Boolean {
+        val user = getUserByPhoneNumber(request.phoneNumber)
 
-        if (user.balance < amount) return false
+        if (user.balance < request.amount) return false
 
-        user.balance = user.balance.subtract(amount)
+        user.balance = user.balance.subtract(request.amount)
         repository.save(user)
         return true
     }
 
     @Transactional
-    override fun fill(phoneNumber: String, amount: BigDecimal): UserResponseDto {
-        val user = getUserByPhoneNumber(phoneNumber)
-        user.balance = user.balance.add(amount)
+    override fun fill(request: BalanceRequest): UserResponseDto {
+        val user = getUserByPhoneNumber(request.phoneNumber)
+        user.balance = user.balance.add(request.amount)
         val saved = repository.save(user)
         return mapper.toDto(saved)
     }

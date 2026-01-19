@@ -1,6 +1,8 @@
 package uz.vv.userservice.controller
 
 import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import uz.vv.userservice.dto.LoginRequest
 import uz.vv.userservice.dto.RegisterRequest
@@ -12,8 +14,9 @@ import uz.vv.userservice.service.AuthService
 class AuthController(private val authService: AuthService) {
 
     @PostMapping("/register")
-    fun register(@Valid @RequestBody dto: RegisterRequest): String {
-        return authService.register(dto)
+    fun register(@Valid @RequestBody dto: RegisterRequest): ResponseEntity<UserResponseDto> {
+        val created = authService.register(dto)
+        return ResponseEntity.status(HttpStatus.CREATED).body(created)
     }
 
     @PostMapping("/login")

@@ -17,20 +17,14 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder
 ) {
     @Transactional
-    fun register(dto: RegisterRequest): String {
-        return try {
-            val userDTO = UserDTO(
-                firstName = dto.firstName,
-                lastName = dto.lastName,
-                phoneNumber = dto.phoneNumber,
-                password = dto.password
-            )
-
-            userService.create(userDTO)
-            "Successfully registered"
-        } catch (e: Exception) {
-            "Registration failed. Please try again."
-        }
+    fun register(dto: RegisterRequest): UserResponseDto {
+        val userDTO = UserDTO(
+            firstName = dto.firstName,
+            lastName = dto.lastName,
+            phoneNumber = dto.phoneNumber,
+            password = dto.password
+        )
+        return userService.create(userDTO)
     }
 
     @Transactional(readOnly = true)

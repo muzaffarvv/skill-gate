@@ -1,6 +1,7 @@
 package uz.vv.userservice.exception
 
 import jakarta.validation.ValidationException
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
@@ -72,6 +73,15 @@ class GlobalExceptionHandler {
         return ResponseEntity(
             ErrorResponse(ErrorCodes.METHOD_NOT_ALLOWED.name, "HTTP method ${ex.method} is not supported"),
             HttpStatus.METHOD_NOT_ALLOWED
+        )
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException::class)
+    fun handleDataIntegrityViolation(ex: DataIntegrityViolationException): ResponseEntity<ErrorResponse> {
+        // Common cause during registration: duplicate unique fields (e.g., phone number)
+        return ResponseEntity(
+            ErrorResponse(ErrorCodes.PHONE_NUMBER_ALREADY_EXISTS.name, "This phone number is already registered"),
+            HttpStatus.CONFLICT
         )
     }
 

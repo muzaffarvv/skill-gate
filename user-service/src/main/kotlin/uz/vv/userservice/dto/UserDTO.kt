@@ -81,3 +81,8 @@ data class ChangePasswordRequest(
     )
     val newPassword: String
 )
+
+data class BalanceRequest(
+    val phoneNumber: String,
+    val amount: BigDecimal
+)
