@@ -22,4 +22,8 @@ interface PaymentRepo : JpaRepository<Payment, Long> {
     fun findTopSellingCourseIds(pageable: Pageable): List<Long>
 
     fun countByPaymentStatus(status: PaymentStatus): Long
+
+    fun findCoursesIdByPhoneNumber(phoneNumber: String): List<Long>
+
+    fun existsByPhoneNumberAndCourseIdAndPaymentStatus(phoneNumber: String, courseId: Long, paymentStatus: PaymentStatus): Boolean
 }

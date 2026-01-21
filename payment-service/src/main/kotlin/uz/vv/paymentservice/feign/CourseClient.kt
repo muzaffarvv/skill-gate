@@ -16,6 +16,6 @@ interface CourseClient {
     @PostMapping("/api/v1/courses/{id}/enroll")
     fun enrollStudent(
         @PathVariable id: Long,
-        @RequestParam studentPhone: String
+        @RequestParam("studentId") studentId: Long
     )
 }

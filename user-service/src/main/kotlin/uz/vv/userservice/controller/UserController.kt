@@ -39,7 +39,6 @@ class UserController(private val userService: UserService) {
         return ResponseEntity.ok(userService.getByPhoneNumber(phoneNumber))
     }
 
-    // JSON orqali mablag'ni yechish
     @PostMapping("/internal/withdraw")
     fun withdrawInternal(
         @RequestBody request: BalanceRequest

@@ -3,13 +3,16 @@ package uz.vv.paymentservice.service
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uz.vv.paymentservice.dto.BalanceRequest
+import uz.vv.paymentservice.dto.CourseResponse
 import uz.vv.paymentservice.dto.PaymentRequest
 import uz.vv.paymentservice.dto.TransactionDTO
-import uz.vv.paymentservice.feign.CourseClient
 import uz.vv.paymentservice.entity.Payment
 import uz.vv.paymentservice.enum.PaymentStatus
+import uz.vv.paymentservice.feign.CourseClient
 import uz.vv.paymentservice.feign.UserClient
 import uz.vv.paymentservice.repo.PaymentRepo
+import uz.vv.paymentservice.exception.DuplicatePurchaseException
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.ZoneId
@@ -23,7 +26,24 @@ class PaymentService(
 
     @Transactional
     fun buyCourse(request: PaymentRequest) {
+        val alreadyOwned = paymentRepo.existsByPhoneNumberAndCourseIdAndPaymentStatus(
+            request.phoneNumber,
+            request.courseId,
+            PaymentStatus.SUCCESS
+        )
+        if (alreadyOwned) {
+            throw DuplicatePurchaseException("You already own this course")
+        }
+
         val course = courseClient.getCourseById(request.courseId)
+        val user = userClient.getByPhone(request.phoneNumber)
+
+        val userBalance = user.balance
+        if (userBalance == null || userBalance < course.price) {
+            throw uz.vv.paymentservice.exception.InsufficientBalanceException(
+                "Insufficient balance. Please top up your account."
+            )
+        }
 
         val payment = Payment(
             phoneNumber = request.phoneNumber,
@@ -34,9 +54,9 @@ class PaymentService(
         val savedPayment = paymentRepo.save(payment)
 
         try {
-            val isWithdrawn = userClient.withdraw(request.phoneNumber, course.price)
+            val isWithdrawn = userClient.withdraw(BalanceRequest(request.phoneNumber, course.price))
             if (isWithdrawn) {
-                courseClient.enrollStudent(request.courseId, request.phoneNumber)
+                courseClient.enrollStudent(request.courseId, user.id)
                 savedPayment.paymentStatus = PaymentStatus.SUCCESS
             } else {
                 savedPayment.paymentStatus = PaymentStatus.FAILED
@@ -45,6 +65,15 @@ class PaymentService(
             savedPayment.paymentStatus = PaymentStatus.FAILED
         } finally {
             paymentRepo.save(savedPayment)
+        }
+    }
+
+    @Transactional(readOnly = true)
+    fun getCoursesByUserId(phoneNumber: String): List<CourseResponse> {
+        val coursesIds: List<Long> = paymentRepo.findCoursesIdByPhoneNumber(phoneNumber)
+
+        return coursesIds.map { id ->
+            courseClient.getCourseById(id)
         }
     }
 

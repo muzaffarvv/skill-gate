@@ -22,4 +22,7 @@ class Course(
     @CollectionTable(name = "course_students", joinColumns = [JoinColumn(name = "course_id")])
     @Column(name = "student_id")
     var studentsIds: MutableList<Long> = mutableListOf(),
+
+    @OneToMany(mappedBy = "course", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var lessons: MutableList<Lesson> = mutableListOf()
 ) : BaseEntity()

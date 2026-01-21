@@ -20,7 +20,7 @@ data class CourseResponse(
     val title: String?,
     val description: String?,
     val price: BigDecimal,
-    val lessons: List<LessonResponse> = emptyList(),
+    val lessons: List<LessonResponse>,
     val totalDuration: Int?
 )
 

@@ -16,11 +16,26 @@ class PaymentController(
 
     @PostMapping("/buy")
     fun buy(@RequestBody request: PaymentRequest): ResponseEntity<String> {
-        paymentService.buyCourse(request)
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body("Course purchased successfully")
+        return try {
+            paymentService.buyCourse(request)
+            ResponseEntity
+                .status(HttpStatus.OK)
+                .body("Course purchased successfully")
+        } catch (ex: uz.vv.paymentservice.exception.DuplicatePurchaseException) {
+            ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ex.message ?: "You already own this course")
+        } catch (ex: uz.vv.paymentservice.exception.InsufficientBalanceException) {
+            ResponseEntity
+                .status(HttpStatus.PAYMENT_REQUIRED)
+                .body(ex.message ?: "Insufficient balance. Please top up your account.")
+        }
     }
+
+    @GetMapping("/courses/{phoneNumber}")
+    fun coursesByPhoneNumber(@PathVariable phoneNumber: String) = ResponseEntity.ok(
+        paymentService.getCoursesByUserId(phoneNumber)
+    )
 
     @GetMapping("/internal/total-earnings")
     fun getTotalEarnings(): ResponseEntity<BigDecimal> {

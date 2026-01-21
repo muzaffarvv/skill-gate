@@ -1,8 +1,10 @@
 package uz.vv.courseservice.controller
 
 import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import uz.vv.courseservice.dto.LessonCU
 import uz.vv.courseservice.dto.LessonResponse
 import uz.vv.courseservice.service.LessonService
@@ -15,7 +17,13 @@ class LessonController(
 
     @PostMapping
     fun create(@Valid @RequestBody dto: LessonCU): ResponseEntity<LessonResponse> {
-        return ResponseEntity.ok(service.create(dto))
+        val created = service.create(dto)
+        val location = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(created.id)
+            .toUri()
+        return ResponseEntity.status(HttpStatus.CREATED).location(location).body(created)
     }
 
     @PutMapping("/{id}")

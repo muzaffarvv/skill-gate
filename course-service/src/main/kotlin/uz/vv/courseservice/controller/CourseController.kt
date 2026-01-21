@@ -2,12 +2,15 @@ package uz.vv.courseservice.controller
 
 import jakarta.validation.Valid
 import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import uz.vv.courseservice.dto.CourseCU
 import uz.vv.courseservice.dto.CourseResponse
 import uz.vv.courseservice.feign.UserClient
 import uz.vv.courseservice.service.CourseService
+import feign.FeignException
 
 @RestController
 @RequestMapping("/api/v1/courses")
@@ -18,7 +21,13 @@ class CourseController(
 
     @PostMapping
     fun create(@Valid @RequestBody dto: CourseCU): ResponseEntity<CourseResponse> {
-        return ResponseEntity.ok(service.create(dto))
+        val created = service.create(dto)
+        val location = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(created.id)
+            .toUri()
+        return ResponseEntity.status(HttpStatus.CREATED).location(location).body(created)
     }
 
     @PutMapping("/{id}")
@@ -49,7 +58,7 @@ class CourseController(
     @PostMapping("/{id}/enroll")
     fun enroll(@PathVariable id: Long, @RequestParam studentId: Long): ResponseEntity<Unit> {
         service.enrollStudent(id, studentId)
-        return ResponseEntity.ok().build()
+        return ResponseEntity.noContent().build()
     }
 
     @GetMapping("/user/{id}")
@@ -58,8 +67,12 @@ class CourseController(
             val user = userClient.getUserById(id)
             val courses = service.getCoursesByUser(user.id)
             ResponseEntity.ok(courses)
-        } catch (e: Exception) {
-            ResponseEntity.badRequest().build()
+        } catch (e: FeignException.NotFound) {
+            println("Feign xatosi: ${e.message}")
+            ResponseEntity.status(HttpStatus.NOT_FOUND).build()
+        } catch (e: FeignException) {
+            println("Feign xatosi: ${e.message}")
+            ResponseEntity.status(HttpStatus.BAD_GATEWAY).build()
         }
     }
 }

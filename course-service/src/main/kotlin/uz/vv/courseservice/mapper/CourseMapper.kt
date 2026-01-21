@@ -8,12 +8,14 @@ import uz.vv.courseservice.dto.CourseCU
 object CourseMapper : BaseMapper<Course, CourseResponse> {
 
     override fun toDto(entity: Course): CourseResponse {
+        val lessonDtos = entity.lessons.map { LessonMapper.toDto(it) }
         return CourseResponse(
             id = entity.id,
             title = entity.title,
             description = entity.description,
             price = entity.price,
-            totalDuration = 0
+            lessons = lessonDtos,
+            totalDuration = lessonDtos.size
         )
     }
 
